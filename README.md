@@ -192,6 +192,7 @@ vercel env add GEMINI_API_KEY
 Potential enhancements for production deployment:
 
 ### Short-term
+- [ ] **Better Search** - Have the llm generate search terms to look up trials
 - [ ] **LLM Improvements** - Model Redundancy, and backup
 - [ ] **Trial Search Improvements** - Better filtration
 - [ ] **Enhanced Error Handling** - Better translation of errors to user
