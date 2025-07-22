@@ -9,7 +9,7 @@ interface ClinicalTrialsListProps {
 }
 
 export function ClinicalTrialsList({ trials }: ClinicalTrialsListProps) {
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('RECRUITING');
   const [rankFilter, setRankFilter] = useState('all');
   const [showPoorFits, setShowPoorFits] = useState(false);
   
@@ -19,7 +19,7 @@ export function ClinicalTrialsList({ trials }: ClinicalTrialsListProps) {
   
   // Apply filters to good trials
   const filteredGoodTrials = goodTrials.filter(trial => {
-    if (statusFilter !== 'all' && trial.overallStatus !== statusFilter) return false;
+    if (trial.overallStatus !== statusFilter) return false;
     if (rankFilter !== 'all') {
       if (rankFilter === 'excellent' && trial.aiRank !== 1) return false;
       if (rankFilter === 'good' && trial.aiRank !== 2) return false;
@@ -41,7 +41,6 @@ export function ClinicalTrialsList({ trials }: ClinicalTrialsListProps) {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="text-sm bg-background border border-border rounded-md px-3 py-1 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             >
-              <option value="all">All Status</option>
               <option value="RECRUITING">Recruiting</option>
               <option value="ACTIVE_NOT_RECRUITING">Active</option>
               <option value="COMPLETED">Completed</option>
