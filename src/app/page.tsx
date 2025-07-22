@@ -1,6 +1,6 @@
 'use client';
 
-import { TranscriptInput } from '@/components/forms';
+import { TranscriptInput } from '@/components/forms/TranscriptInput';
 import { ResultsContainer } from '@/components/results';
 import { ErrorDisplay, Header } from '@/components/ui';
 import { useAnalysis } from '@/hooks';
@@ -35,7 +35,7 @@ function ResultsView({ result, onBack }: { result: any; onBack: () => void }) {
   );
 }
 
-function InputView({ onAnalyze, isLoading, error }: { onAnalyze: (transcript: string) => void; isLoading: boolean; error: string | null }) {
+function InputView({ onAnalyze, isLoading, error, transcript, onClear }: { onAnalyze: (transcript: string) => void; isLoading: boolean; error: string | null; transcript: string; onClear: () => void }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-4xl mx-auto">
@@ -44,6 +44,8 @@ function InputView({ onAnalyze, isLoading, error }: { onAnalyze: (transcript: st
           <TranscriptInput 
             onAnalyze={onAnalyze}
             isLoading={isLoading}
+            value={transcript}
+            onClear={onClear}
           />
         
         {error && <ErrorDisplay error={error} />}
@@ -53,7 +55,7 @@ function InputView({ onAnalyze, isLoading, error }: { onAnalyze: (transcript: st
 }
 
 export default function Home() {
-  const { result, isLoading, error, analyzeTranscript, clearResults } = useAnalysis();
+  const { result, isLoading, error, transcript, analyzeTranscript, clearResults, clearInput } = useAnalysis();
 
   if (result) {
     return <ResultsView result={result} onBack={clearResults} />;
@@ -64,6 +66,8 @@ export default function Home() {
       onAnalyze={analyzeTranscript}
       isLoading={isLoading}
       error={error}
+      transcript={transcript}
+      onClear={clearInput}
     />
   );
 }

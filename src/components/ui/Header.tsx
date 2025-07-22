@@ -1,12 +1,12 @@
+import { Stethoscope } from "lucide-react";
+
 export function Header() {
   return (
     <div className="text-center mb-16">
+      <Stethoscope className="h-12 w-12 mx-auto mb-3 text-primary" />
       <h1 className="text-4xl font-semibold text-foreground mb-3">
         Clinical Trials Matcher
       </h1>
-      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-        Enter a patient-doctor conversation transcript to extract patient data and find matching clinical trials using AI
-      </p>
     </div>
   );
 }

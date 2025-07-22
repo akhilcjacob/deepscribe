@@ -5,13 +5,15 @@ export function useAnalysis() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [transcript, setTranscript] = useState<string>('');
 
-  const analyzeTranscript = async (transcript: string) => {
-    if (!transcript.trim()) {
+  const analyzeTranscript = async (inputTranscript: string) => {
+    if (!inputTranscript.trim()) {
       setError('Please enter a transcript to analyze.');
       return;
     }
 
+    setTranscript(inputTranscript);
     setIsLoading(true);
     setError(null);
     setResult(null);
@@ -22,7 +24,7 @@ export function useAnalysis() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ transcript }),
+        body: JSON.stringify({ transcript: inputTranscript }),
       });
 
       const data = await response.json();
@@ -51,11 +53,19 @@ export function useAnalysis() {
     setError(null);
   };
 
+  const clearInput = () => {
+    setTranscript('');
+    setResult(null);
+    setError(null);
+  };
+
   return {
     result,
     isLoading,
     error,
+    transcript,
     analyzeTranscript,
     clearResults,
+    clearInput,
   };
 }

@@ -38,17 +38,19 @@ export function BentoCard({
     >
       <div className={cn('flex justify-between items-start mb-4', headerClassName)}>
         <div className="space-y-1.5">
-          <h2 className="font-semibold text-foreground/90 flex items-center gap-2">
+          <h2 className="font-semibold text-foreground/90">
             {title}
-            {titleAccessory}
           </h2>
           {description && <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>}
         </div>
-        {Icon && (
-          <div className="p-2 rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20">
-            <Icon size={18} strokeWidth={1.5} />
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          {titleAccessory}
+          {Icon && (
+            <div className="p-2 rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20">
+              <Icon size={18} strokeWidth={1.5} />
+            </div>
+          )}
+        </div>
       </div>
 
       <div className={cn('grow', contentClassName)}>

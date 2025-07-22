@@ -1,46 +1,61 @@
-import { Stethoscope, ChevronDown, ChevronRight } from 'lucide-react';
 import { ClinicalTrial } from '@/models';
-import { ClinicalTrialCard } from './ClinicalTrialCard';
 import { useState } from 'react';
+import { BentoCard } from '../BentoCard';
+import { CollapsibleSection } from './CollapsibleSection';
+import { TrialFilters } from './TrialFilters';
+import { TrialGrid } from './TrialGrid';
+import { useTrialFilters } from '@/hooks';
 
 interface ClinicalTrialsListProps {
   trials: ClinicalTrial[];
 }
 
 export function ClinicalTrialsList({ trials }: ClinicalTrialsListProps) {
+  const [showOtherTrials, setShowOtherTrials] = useState(false);
+  
+  const {
+    phaseFilter,
+    rankFilter,
+    uniquePhases,
+    filteredTrials,
+    mainTrials,
+    otherTrials,
+    setPhaseFilter,
+    setRankFilter,
+  } = useTrialFilters(trials);
+  
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-primary text-primary-foreground">
-          <Stethoscope className="h-5 w-5" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold text-foreground">
-            Clinical Trials ({trials.length})
-          </h2>
-        </div>
-      </div>
-      
-      {/* Trials Grid */}
-      <div className="space-y-4">
-        {trials.length === 0 ? (
-          <div className="bg-card border border-border rounded-xl p-8 text-center">
-            <p className="text-muted-foreground">
-              No clinical trials found.
-            </p>
+      <BentoCard 
+        title={`Clinical Trials (${filteredTrials.length}${filteredTrials.length !== trials.length ? ` of ${trials.length}` : ''})`}
+        description="Ranked by AI relevance"
+      >
+        <div className="flex justify-between items-center">
+          <TrialFilters
+            phaseFilter={phaseFilter}
+            rankFilter={rankFilter}
+            uniquePhases={uniquePhases}
+            onPhaseChange={setPhaseFilter}
+            onRankChange={setRankFilter}
+          />
+          <div className="text-sm text-muted-foreground">
+            {mainTrials.length > 0 && `${mainTrials.length} relevant`}
+            {otherTrials.length > 0 && ` • ${otherTrials.length} other`}
           </div>
-        ) : (
-          <>
-            {/* Desktop: 2x2 Grid, Mobile: Single column */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
-              {trials.map((trial) => (
-                <ClinicalTrialCard key={trial.nctId} trial={trial} />
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+        </div>
+      </BentoCard>
+      
+      <TrialGrid trials={mainTrials} totalTrials={trials.length} />
+      
+      {otherTrials.length > 0 && (
+        <CollapsibleSection
+          title={`Other Trials (${otherTrials.length})`}
+          isOpen={showOtherTrials}
+          onToggle={() => setShowOtherTrials(!showOtherTrials)}
+        >
+          <TrialGrid trials={otherTrials} totalTrials={trials.length} />
+        </CollapsibleSection>
+      )}
     </div>
   );
 }

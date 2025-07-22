@@ -1,1 +1,0 @@
-export { TranscriptInput } from './TranscriptInput';

@@ -1,16 +1,22 @@
 'use client';
 
 import { SAMPLE_TRANSCRIPT } from '@/constants/sample-data';
-import { FileText, Loader2, Search } from 'lucide-react';
-import { useState } from 'react';
+import { FileText, Loader2, Search, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 interface TranscriptInputProps {
   onAnalyze: (transcript: string) => void;
   isLoading: boolean;
+  value?: string;
+  onClear?: () => void;
 }
 
-export function TranscriptInput({ onAnalyze, isLoading }: TranscriptInputProps) {
-  const [transcript, setTranscript] = useState('');
+export function TranscriptInput({ onAnalyze, isLoading, value, onClear }: TranscriptInputProps) {
+  const [transcript, setTranscript] = useState(value || '');
+
+  useEffect(() => {
+    setTranscript(value || '');
+  }, [value]);
 
   const handleAnalyze = () => {
     onAnalyze(transcript);
@@ -18,6 +24,11 @@ export function TranscriptInput({ onAnalyze, isLoading }: TranscriptInputProps) 
 
   const loadSampleTranscript = () => {
     setTranscript(SAMPLE_TRANSCRIPT);
+  };
+
+  const handleClear = () => {
+    setTranscript('');
+    onClear?.();
   };
 
   return (
@@ -31,9 +42,21 @@ export function TranscriptInput({ onAnalyze, isLoading }: TranscriptInputProps) 
         />
         
         <div className="absolute bottom-6 right-6 flex gap-3">
+          {transcript && (
+            <button
+              onClick={handleClear}
+              disabled={isLoading}
+              className="px-4 py-2 text-sm border border-border text-muted-foreground rounded-xl hover:bg-secondary transition-all duration-200 backdrop-blur-3xl bg-card font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <X className="h-4 w-4" />
+              Clear
+            </button>
+          )}
+          
           <button
             onClick={loadSampleTranscript}
-            className="px-4 py-2 text-sm border border-border text-muted-foreground rounded-xl hover:bg-secondary transition-all duration-200 backdrop-blur-3xl bg-card font-medium flex items-center gap-1"
+            disabled={isLoading}
+            className="px-4 py-2 text-sm border border-border text-muted-foreground rounded-xl hover:bg-secondary transition-all duration-200 backdrop-blur-3xl bg-card font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FileText className="h-4 w-4 pr-1" />
             Load Sample
