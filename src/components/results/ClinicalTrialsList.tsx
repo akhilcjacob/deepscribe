@@ -1,6 +1,7 @@
-import { Stethoscope } from 'lucide-react';
+import { Stethoscope, ChevronDown, ChevronRight } from 'lucide-react';
 import { ClinicalTrial } from '@/models';
 import { ClinicalTrialCard } from './ClinicalTrialCard';
+import { useState } from 'react';
 
 interface ClinicalTrialsListProps {
   trials: ClinicalTrial[];
@@ -8,25 +9,36 @@ interface ClinicalTrialsListProps {
 
 export function ClinicalTrialsList({ trials }: ClinicalTrialsListProps) {
   return (
-    <div className="bg-card backdrop-blur-3xl border border-border rounded-2xl shadow-2xl p-8">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-2 rounded-xl bg-primary text-primary-foreground">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="p-2 rounded-lg bg-primary text-primary-foreground">
           <Stethoscope className="h-5 w-5" />
         </div>
-        <h2 className="text-2xl font-semibold text-foreground">
-          Matching Clinical Trials ({trials.length})
-        </h2>
+        <div>
+          <h2 className="text-xl font-semibold text-foreground">
+            Clinical Trials ({trials.length})
+          </h2>
+        </div>
       </div>
       
-      <div className="space-y-6 max-h-[600px] overflow-y-auto">
+      {/* Trials Grid */}
+      <div className="space-y-4">
         {trials.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">
-            No matching clinical trials found.
-          </p>
+          <div className="bg-card border border-border rounded-xl p-8 text-center">
+            <p className="text-muted-foreground">
+              No clinical trials found.
+            </p>
+          </div>
         ) : (
-          trials.map((trial) => (
-            <ClinicalTrialCard key={trial.nctId} trial={trial} />
-          ))
+          <>
+            {/* Desktop: 2x2 Grid, Mobile: Single column */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+              {trials.map((trial) => (
+                <ClinicalTrialCard key={trial.nctId} trial={trial} />
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

@@ -5,7 +5,7 @@ import React from 'react';
 
 interface BentoCardProps {
   icon?: React.ElementType;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   description?: string;
   children: React.ReactNode;
   className?: string;
@@ -16,7 +16,7 @@ interface BentoCardProps {
   onClick?: () => void;
 }
 
-const BASE_CARD_CLASSES = 'rounded-2xl bg-card/30 backdrop-blur-2xl border border-border/30 w-full h-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:bg-card/40';
+const BASE_CARD_CLASSES = 'rounded-2xl bg-card/80 backdrop-blur-sm border border-border/50 w-full h-full shadow-lg hover:shadow-xl transition-all duration-300 hover:bg-card/90';
 const DEFAULT_PADDING = 'p-8';
 
 export function BentoCard({
@@ -38,10 +38,10 @@ export function BentoCard({
     >
       <div className={cn('flex justify-between items-start mb-4', headerClassName)}>
         <div className="space-y-1.5">
-          <h3 className="text-sm font-semibold text-foreground/90 flex items-center gap-2">
+          <h2 className="font-semibold text-foreground/90 flex items-center gap-2">
             {title}
             {titleAccessory}
-          </h3>
+          </h2>
           {description && <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>}
         </div>
         {Icon && (

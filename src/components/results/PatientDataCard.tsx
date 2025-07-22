@@ -1,5 +1,6 @@
-import { User, Calendar, MapPin, Activity, FlaskConical } from 'lucide-react';
 import { PatientData } from '@/models';
+import { Activity, Calendar, FlaskConical, MapPin, User } from 'lucide-react';
+import { BentoCard } from '../BentoCard';
 
 interface PatientDataCardProps {
   patientData: PatientData;
@@ -7,21 +8,16 @@ interface PatientDataCardProps {
 
 export function PatientDataCard({ patientData }: PatientDataCardProps) {
   return (
-    <div className="bg-card backdrop-blur-3xl border border-border rounded-2xl shadow-2xl p-8">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-2 rounded-xl bg-primary text-primary-foreground">
-          <User className="h-5 w-5" />
-        </div>
-        <h2 className="text-2xl font-semibold text-foreground">
-          Extracted Patient Data
-        </h2>
-      </div>
-      
-      <div className="space-y-6">
+    <BentoCard 
+      icon={User} 
+      title="Patient Data" 
+      description=""
+    >
+      <div className="space-y-4">
         {patientData.age && (
           <div className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-muted-foreground" />
-            <span className="text-foreground text-lg">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-foreground">
               Age: {patientData.age}
             </span>
           </div>
@@ -29,8 +25,8 @@ export function PatientDataCard({ patientData }: PatientDataCardProps) {
 
         {patientData.gender && (
           <div className="flex items-center gap-3">
-            <User className="h-5 w-5 text-muted-foreground" />
-            <span className="text-foreground text-lg">
+            <User className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-foreground capitalize">
               Gender: {patientData.gender}
             </span>
           </div>
@@ -38,8 +34,8 @@ export function PatientDataCard({ patientData }: PatientDataCardProps) {
 
         {patientData.location && (
           <div className="flex items-center gap-3">
-            <MapPin className="h-5 w-5 text-muted-foreground" />
-            <span className="text-foreground text-lg">
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-foreground">
               Location: {patientData.location}
             </span>
           </div>
@@ -48,14 +44,14 @@ export function PatientDataCard({ patientData }: PatientDataCardProps) {
         {patientData.conditions && patientData.conditions.length > 0 && (
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <Activity className="h-5 w-5 text-muted-foreground" />
-              <h3 className="font-semibold text-foreground text-lg">
-                Conditions:
+              <Activity className="h-4 w-4 text-muted-foreground" />
+              <h3 className="text-sm font-medium text-foreground">
+                Conditions
               </h3>
             </div>
-            <ul className="list-disc list-inside space-y-2 ml-8">
+            <ul className="space-y-1 ml-7">
               {patientData.conditions.map((condition: string, index: number) => (
-                <li key={index} className="text-muted-foreground">
+                <li key={index} className="text-sm text-muted-foreground">
                   {condition}
                 </li>
               ))}
@@ -66,14 +62,14 @@ export function PatientDataCard({ patientData }: PatientDataCardProps) {
         {patientData.medications && patientData.medications.length > 0 && (
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <FlaskConical className="h-5 w-5 text-muted-foreground" />
-              <h3 className="font-semibold text-foreground text-lg">
-                Medications:
+              <FlaskConical className="h-4 w-4 text-muted-foreground" />
+              <h3 className="text-sm font-medium text-foreground">
+                Medications
               </h3>
             </div>
-            <ul className="list-disc list-inside space-y-2 ml-8">
+            <ul className="space-y-1 ml-7">
               {patientData.medications.map((medication: string, index: number) => (
-                <li key={index} className="text-muted-foreground">
+                <li key={index} className="text-sm text-muted-foreground">
                   {medication}
                 </li>
               ))}
@@ -81,6 +77,6 @@ export function PatientDataCard({ patientData }: PatientDataCardProps) {
           </div>
         )}
       </div>
-    </div>
+    </BentoCard>
   );
 }

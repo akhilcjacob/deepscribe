@@ -1,72 +1,50 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Apple-like rounded corners */
-  --radius: 1.25rem;
-  --radius-sm: 0.75rem;
-  --radius-md: 1rem;
-  --radius-lg: 1.5rem;
-  --radius-xl: 2rem;
-  --radius-2xl: 2.5rem;
-  
-  /* Apple-inspired color palette with glassmorphism */
   --color-background: oklch(0.08 0.002 285.823);
   --color-foreground: oklch(0.98 0.005 285.823);
   
-  /* Glass card with subtle backdrop blur effect */
   --color-card: color-mix(in srgb, var(--color-foreground) 3%, transparent);
   --color-card-foreground: oklch(0.95 0.008 285.823);
-  --color-card-glass: color-mix(in srgb, var(--color-foreground) 8%, transparent);
   
-  /* Refined popover styling */
   --color-popover: color-mix(in srgb, var(--color-foreground) 5%, transparent);
   --color-popover-foreground: oklch(0.95 0.008 285.823);
   
-  /* Apple blue accent */
   --color-primary: oklch(0.55 0.15 235.06);
   --color-primary-foreground: oklch(0.98 0.005 285.823);
   --color-primary-soft: oklch(0.55 0.15 235.06 / 20%);
   
-  /* Subtle secondary colors */
   --color-secondary: oklch(0.18 0.008 285.9 / 60%);
   --color-secondary-foreground: oklch(0.85 0.015 285.823);
   
-  /* Muted tones for better hierarchy */
   --color-muted: oklch(0.15 0.008 286.033);
   --color-muted-foreground: oklch(0.65 0.02 286.067);
   
-  /* Accent matching primary */
   --color-accent: oklch(0.55 0.15 235.06);
   --color-accent-foreground: oklch(0.98 0.005 285.823);
   
-  /* Apple red for destructive actions */
   --color-destructive: oklch(0.65 0.2 25.0);
   --color-destructive-foreground: oklch(0.98 0.005 285.823);
   
-  /* Refined borders and inputs */
   --color-border: oklch(1 0 0 / 8%);
   --color-input: oklch(1 0 0 / 12%);
   --color-ring: oklch(0.55 0.15 235.06 / 60%);
   
-  /* Enhanced chart colors */
   --color-chart-1: oklch(0.55 0.15 235.06);
   --color-chart-2: oklch(0.65 0.18 162.48);
   --color-chart-3: oklch(0.7 0.2 70.08);
   --color-chart-4: oklch(0.6 0.25 303.9);
   --color-chart-5: oklch(0.65 0.22 16.439);
   
-  /* Interactive states */
   --color-hover: color-mix(in srgb, var(--color-foreground) 8%, transparent);
   --color-active: color-mix(in srgb, var(--color-foreground) 12%, transparent);
   
-  /* Apple-style shadows */
   --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.05);
   --shadow: 0 4px 12px -2px oklch(0 0 0 / 0.1), 0 2px 4px -1px oklch(0 0 0 / 0.06);
   --shadow-lg: 0 10px 25px -3px oklch(0 0 0 / 0.15), 0 4px 6px -2px oklch(0 0 0 / 0.05);
   --shadow-xl: 0 20px 40px -4px oklch(0 0 0 / 0.2), 0 8px 16px -4px oklch(0 0 0 / 0.1);
   --shadow-primary: 0 8px 20px -4px oklch(0.55 0.15 235.06 / 0.3);
   
-  /* Glassmorphism backdrop blur */
   --backdrop-blur: blur(20px);
   --backdrop-blur-sm: blur(8px);
   --backdrop-blur-lg: blur(32px);
@@ -75,7 +53,7 @@
 [data-theme='light'] {
   --color-background: oklch(0.98 0.002 285.823);
   --color-foreground: oklch(0.12 0.008 285.823);
-  --color-card: color-mix(in srgb, var(--color-background) 80%, white);
+  --color-card: color-mix(in srgb, var(--color-background) 90%, white);
   --color-card-foreground: oklch(0.15 0.008 285.823);
   --color-card-glass: color-mix(in srgb, white 85%, transparent);
   --color-primary: oklch(0.5 0.15 235.06);
@@ -97,7 +75,6 @@
 }
 
 body {
-  background: linear-gradient(to bottom, var(--color-background), color-mix(in srgb, var(--color-primary) 40%, transparent));
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -125,21 +102,3 @@ body {
   scrollbar-color: var(--color-hover) transparent;
 }
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%) skewX(12deg);
-  }
-  100% {
-    transform: translateX(400%) skewX(12deg);
-  }
-}
-
-@keyframes shine-pulse {
-  0%,
-  100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 1;
-  }
-}

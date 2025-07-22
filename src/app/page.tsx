@@ -2,9 +2,9 @@
 
 import { TranscriptInput } from '@/components/forms';
 import { ResultsContainer } from '@/components/results';
-import { BentoCard, ErrorDisplay, Header } from '@/components/ui';
+import { ErrorDisplay, Header } from '@/components/ui';
 import { useAnalysis } from '@/hooks';
-import { ArrowLeft, FileText, Sparkles } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 function ResultsView({ result, onBack }: { result: any; onBack: () => void }) {
   return (
@@ -41,17 +41,10 @@ function InputView({ onAnalyze, isLoading, error }: { onAnalyze: (transcript: st
       <div className="w-full max-w-4xl mx-auto">
         <Header />
         
-        <BentoCard
-          icon={FileText}
-          title="Enter Transcript"
-          description="Paste or type a patient-doctor conversation transcript to analyze"
-          className="mb-8"
-        >
           <TranscriptInput 
             onAnalyze={onAnalyze}
             isLoading={isLoading}
           />
-        </BentoCard>
         
         {error && <ErrorDisplay error={error} />}
       </div>

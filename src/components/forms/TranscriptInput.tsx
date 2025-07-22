@@ -21,35 +21,37 @@ export function TranscriptInput({ onAnalyze, isLoading }: TranscriptInputProps) 
   };
 
   return (
-    <div className="relative">
-      <textarea
-        value={transcript}
-        onChange={(e) => setTranscript(e.target.value)}
-        placeholder="Enter the patient-doctor conversation transcript here..."
-        className="w-full h-64 p-4 pb-16 bg-background/50 border border-border/50 rounded-xl resize-none focus:outline-none focus:border-primary/50 transition-all duration-200 text-foreground placeholder:text-muted-foreground/60 leading-relaxed"
-      />
-      
-      <div className="absolute bottom-4 right-4 flex gap-2">
-        <button
-          onClick={loadSampleTranscript}
-          className="px-3 py-1.5 text-xs border border-border/50 text-muted-foreground rounded-lg hover:bg-secondary transition-all duration-200 bg-background/80 font-medium flex items-center gap-1"
-        >
-          <FileText className="h-3 w-3" />
-          Sample
-        </button>
+    <div className="mb-8">
+      <div className="relative">
+        <textarea
+          value={transcript}
+          onChange={(e) => setTranscript(e.target.value)}
+          placeholder="Enter the patient-doctor conversation transcript here..."
+          className="w-full h-80 p-6 pb-20 bg-card backdrop-blur-3xl border border-border rounded-3xl resize-none focus:outline-none focus:border-primary/50 focus:bg-card transition-all duration-200 text-foreground placeholder:text-muted-foreground/60 text-lg leading-relaxed shadow-xl hover:shadow-2xl"
+        />
         
-        <button
-          onClick={handleAnalyze}
-          disabled={isLoading || !transcript.trim()}
-          className="flex items-center gap-2 px-4 py-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
-        >
-          {isLoading ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <Search className="h-3 w-3" />
-          )}
-          {isLoading ? 'Analyzing...' : 'Analyze'}
-        </button>
+        <div className="absolute bottom-6 right-6 flex gap-3">
+          <button
+            onClick={loadSampleTranscript}
+            className="px-4 py-2 text-sm border border-border text-muted-foreground rounded-xl hover:bg-secondary transition-all duration-200 backdrop-blur-3xl bg-card font-medium flex items-center gap-1"
+          >
+            <FileText className="h-4 w-4 pr-1" />
+            Load Sample
+          </button>
+          
+          <button
+            onClick={handleAnalyze}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-xl hover:bg-primary disabled:opacity-50 backdrop-blur-3xl disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Search className="h-4 w-4" />
+            )}
+            {isLoading ? 'Analyzing...' : 'Analyze'}
+          </button>
+        </div>
       </div>
     </div>
   );

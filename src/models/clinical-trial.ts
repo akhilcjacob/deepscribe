@@ -27,6 +27,8 @@ export interface ClinicalTrial {
   maximumAge?: string;
   gender: string;
   relevanceScore?: number;
+  aiRank?: number; // 1-5 ranking from AI (1 = best match)
+  aiReasoning?: string; // AI explanation for the ranking
 }
 
 export interface ClinicalTrialsResponse {

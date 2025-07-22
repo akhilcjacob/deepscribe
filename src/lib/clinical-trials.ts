@@ -1,4 +1,5 @@
-import { PatientData, ClinicalTrial, ClinicalTrialsResponse } from '@/models';
+import { ClinicalTrial, ClinicalTrialsResponse, PatientData } from '@/models';
+import { rankClinicalTrials } from './gemini';
 
 export async function searchClinicalTrials(patientData: PatientData): Promise<ClinicalTrial[]> {
   const baseUrl = 'https://clinicaltrials.gov/api/v2/studies';
@@ -78,72 +79,10 @@ export async function searchClinicalTrials(patientData: PatientData): Promise<Cl
       };
     });
 
-    // Calculate relevance scores and sort
-    const scoredTrials = trials.map(trial => ({
-      ...trial,
-      relevanceScore: calculateRelevanceScore(trial, patientData)
-    }));
-
-    return scoredTrials.sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0));
+    // Use AI to rank trials intelligently
+    return await rankClinicalTrials(trials, patientData);
   } catch (error) {
     console.error('Error searching clinical trials:', error);
     throw new Error('Failed to search clinical trials');
   }
-}
-
-function calculateRelevanceScore(trial: ClinicalTrial, patientData: PatientData): number {
-  let score = 0;
-
-  // Score based on condition matches
-  if (patientData.conditions && trial.conditions) {
-    const patientConditionsLower = patientData.conditions.map((c: string) => c.toLowerCase());
-    const trialConditionsLower = trial.conditions.map((c: string) => c.toLowerCase());
-    
-    for (const patientCondition of patientConditionsLower) {
-      for (const trialCondition of trialConditionsLower) {
-        if (trialCondition.includes(patientCondition) || patientCondition.includes(trialCondition)) {
-          score += 10;
-        }
-      }
-    }
-  }
-
-  // Score based on location proximity (simple match)
-  if (patientData.location && trial.locations) {
-    const patientLocationLower = patientData.location.toLowerCase();
-    for (const location of trial.locations) {
-      if (location.city?.toLowerCase().includes(patientLocationLower) ||
-          location.state?.toLowerCase().includes(patientLocationLower) ||
-          patientLocationLower.includes(location.city?.toLowerCase() || '') ||
-          patientLocationLower.includes(location.state?.toLowerCase() || '')) {
-        score += 5;
-      }
-    }
-  }
-
-  // Score based on age eligibility
-  if (patientData.age && trial.minimumAge && trial.maximumAge) {
-    const minAge = parseInt(trial.minimumAge.replace(/\D/g, ''));
-    const maxAge = parseInt(trial.maximumAge.replace(/\D/g, ''));
-    
-    if (!isNaN(minAge) && !isNaN(maxAge) && 
-        patientData.age >= minAge && patientData.age <= maxAge) {
-      score += 3;
-    }
-  }
-
-  // Score based on gender match
-  if (patientData.gender && trial.gender) {
-    if (trial.gender.toLowerCase() === 'all' || 
-        trial.gender.toLowerCase() === patientData.gender.toLowerCase()) {
-      score += 2;
-    }
-  }
-
-  // Bonus for recruiting status
-  if (trial.overallStatus === 'RECRUITING') {
-    score += 1;
-  }
-
-  return score;
 }
