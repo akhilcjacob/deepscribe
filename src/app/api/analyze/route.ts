@@ -1,39 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { extractPatientData } from '@/lib/gemini';
 import { searchClinicalTrials } from '@/lib/clinical-trials';
-import type { AnalyzeRequest, AnalyzeResponse, AnalyzeErrorResponse } from '@/models';
+import { apiError, apiSuccess, validateTranscript } from '@/lib/error-utils';
 
 export async function POST(request: NextRequest) {
   try {
-    const { transcript } = await request.json();
-
-    if (!transcript || typeof transcript !== 'string') {
-      return NextResponse.json(
-        { error: 'Transcript is required and must be a string' },
-        { status: 400 }
-      );
-    }
-
+    const body = await request.json();
+    const transcript = validateTranscript(body.transcript);
+    
     const patientData = await extractPatientData(transcript);
     const trials = await searchClinicalTrials(patientData);
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        patientData,
-        trials
-      }
-    });
-
-  } catch (error) {
-    console.error('Analysis error:', error);
     
-    return NextResponse.json(
-      { 
-        error: 'Failed to analyze transcript',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    return apiSuccess({ patientData, trials });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Analysis failed';
+    return apiError(message);
   }
+}
+
+export async function GET() {
+  return apiSuccess({ status: 'healthy' });
 }

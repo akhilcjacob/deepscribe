@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { AnalysisResult } from '@/models';
 
 export function useAnalysis() {
@@ -7,9 +7,19 @@ export function useAnalysis() {
   const [error, setError] = useState<string | null>(null);
   const [transcript, setTranscript] = useState<string>('');
 
-  const analyzeTranscript = async (inputTranscript: string) => {
-    if (!inputTranscript.trim()) {
+  const analyzeTranscript = useCallback(async (inputTranscript: string) => {
+    if (!inputTranscript?.trim()) {
       setError('Please enter a transcript to analyze.');
+      return;
+    }
+
+    if (inputTranscript.length < 10) {
+      setError('Transcript is too short.');
+      return;
+    }
+
+    if (inputTranscript.length > 50000) {
+      setError('Transcript is too long.');
       return;
     }
 
@@ -21,43 +31,42 @@ export function useAnalysis() {
     try {
       const response = await fetch('/api/analyze', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transcript: inputTranscript }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to analyze transcript');
+        setError(data.error || 'Analysis failed');
+        return;
       }
 
-      if (data.success) {
+      if (data.success && data.data) {
         setResult({
           patientData: data.data.patientData,
           trials: data.data.trials,
         });
       } else {
-        throw new Error(data.error || 'Analysis failed');
+        setError('No results returned');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      setError(err instanceof Error ? err.message : 'Network error');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const clearResults = () => {
+  const clearResults = useCallback(() => {
     setResult(null);
     setError(null);
-  };
+  }, []);
 
-  const clearInput = () => {
+  const clearInput = useCallback(() => {
     setTranscript('');
     setResult(null);
     setError(null);
-  };
+  }, []);
 
   return {
     result,

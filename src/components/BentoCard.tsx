@@ -1,7 +1,11 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import React from 'react';
+
+// Simple className merger (replaces deleted utils)
+function cn(...classes: (string | undefined)[]): string {
+  return classes.filter(Boolean).join(' ');
+}
 
 interface BentoCardProps {
   icon?: React.ElementType;

@@ -1,180 +1,100 @@
-import { PatientData, ClinicalTrial } from '@/models';
+import { ClinicalTrial, PatientData } from '@/models';
+import { PATIENT_DATA_SCHEMA, TRIAL_RANKING_SCHEMA } from './schemas';
 
-let GoogleGenerativeAI: any = null;
-let genAI: any = null;
+let models: Record<string, any> = {};
 
-async function getGeminiAI() {
-  if (!GoogleGenerativeAI) {
-    const module = await import('@google/generative-ai');
-    GoogleGenerativeAI = module.GoogleGenerativeAI;
+function getOptimalModel(transcript: string): string {
+  const tokenEstimate = transcript.length / 4;
+
+  if (tokenEstimate <= 1000000) {
+    return "gemini-2.5-flash";
+  } else if (tokenEstimate <= 2000000) {  
+    return "gemini-2.5-pro";
+  } else {
+    throw new Error(`Transcript too long (${Math.round(tokenEstimate).toLocaleString()} tokens). Maximum supported: 2M tokens`);
   }
-  return GoogleGenerativeAI;
 }
 
-async function getGeminiModel() {
-  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'your_gemini_api_key_here') {
-    throw new Error('Gemini API key not configured. Please set GEMINI_API_KEY in your .env.local file.');
+async function getModel(modelName: string) {
+  if (!models[modelName]) {
+    const { GoogleGenerativeAI } = await import('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+    models[modelName] = genAI.getGenerativeModel({ model: modelName });
   }
-
-  if (!genAI) {
-    const GeminiAI = await getGeminiAI();
-    genAI = new GeminiAI(process.env.GEMINI_API_KEY);
-  }
-  
-  return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-}
-
-async function callGemini(prompt: string): Promise<string> {
-  const model = await getGeminiModel();
-  
-  try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-    
-    // Clean up the response to ensure it's valid JSON
-    return text.replace(/```json\n?|\n?```/g, '').trim();
-  } catch (error) {
-    console.error('Error calling Gemini:', error);
-    throw new Error('Failed to get response from Gemini AI');
-  }
+  return models[modelName];
 }
 
 export async function extractPatientData(transcript: string): Promise<PatientData> {
-
-  const prompt = `
-    Analyze the following patient-doctor conversation transcript and extract structured patient data.
-    Return the data as a JSON object with the following schema:
-    
-    {
-      "age": number (if mentioned),
-      "conditions": string[] (medical conditions, diagnoses, symptoms),
-      "medications": string[] (current medications if mentioned),
-      "location": string (city, state, or region if mentioned),
-      "gender": string (if mentioned),
-      "medicalHistory": string[] (relevant medical history if mentioned)
+  const modelName = getOptimalModel(transcript); // Smart model selection!
+  const gemini = await getModel(modelName);
+  
+  const result = await gemini.generateContent([
+    { text: `Extract patient data from this medical conversation. Only include explicitly mentioned information:\n\n${transcript}` }
+  ], {
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: PATIENT_DATA_SCHEMA
     }
-    
-    Focus on extracting:
-    - Primary medical conditions or diagnoses
-    - Age if explicitly stated
-    - Location for clinical trial matching
-    - Current medications
-    - Relevant medical history
-    
-    Only include information that is explicitly mentioned in the transcript.
-    For conditions, include both specific diagnoses and significant symptoms.
-    
-    Transcript:
-    ${transcript}
-    
-    Return only the JSON object, no additional text.
-  `;
+  });
 
-  try {
-    const responseText = await callGemini(prompt);
-    const patientData = JSON.parse(responseText) as PatientData;
-    
-    // Ensure conditions is always an array
-    if (!patientData.conditions) {
-      patientData.conditions = [];
-    }
-    
-    return patientData;
-  } catch (error) {
-    console.error('Error extracting patient data:', error);
-    throw new Error('Failed to extract patient data from transcript');
-  }
+  const data = JSON.parse(result.response.text());
+  
+  return {
+    age: data.age || undefined,
+    conditions: data.conditions || [],
+    medications: data.medications || [],
+    location: data.location || undefined,
+    gender: data.gender || undefined,
+    medicalHistory: data.medicalHistory || []
+  };
 }
 
-export async function rankClinicalTrials(
-  trials: ClinicalTrial[], 
-  patientData: PatientData
-): Promise<ClinicalTrial[]> {
-  if (trials.length === 0) return trials;
+export async function rankClinicalTrials(trials: ClinicalTrial[], patientData: PatientData): Promise<ClinicalTrial[]> {
+  if (!trials.length) return [];
 
-  // Create a detailed prompt for ranking trials
-  const trialsData = trials.map((trial, index) => ({
-    index,
+  const trialsData = trials.slice(0, 15).map((trial, i) => ({
+    index: i,
     title: trial.briefTitle,
-    conditions: trial.conditions,
-    phase: trial.phase,
+    conditions: trial.conditions || [],
     status: trial.overallStatus,
-    locations: trial.locations?.slice(0, 3), // Limit locations for prompt size
-    minimumAge: trial.minimumAge,
-    maximumAge: trial.maximumAge,
-    gender: trial.gender,
-    description: trial.briefSummary?.substring(0, 300) || trial.detailedDescription?.substring(0, 300) // Limit description length
+    locations: trial.locations?.slice(0, 2) || []
   }));
 
-  const prompt = `
-    You are a medical expert helping to rank clinical trials for a patient. 
-    
-    Patient Information:
-    - Age: ${patientData.age || 'Not specified'}
-    - Gender: ${patientData.gender || 'Not specified'}
-    - Location: ${patientData.location || 'Not specified'}
-    - Medical Conditions: ${patientData.conditions?.join(', ') || 'None specified'}
-    - Current Medications: ${patientData.medications?.join(', ') || 'None specified'}
-    
-    Clinical Trials to Rank:
-    ${JSON.stringify(trialsData, null, 2)}
-    
-    Please rank each trial from 1-5 where:
-    - 1 = Excellent match (highly relevant, patient meets criteria)
-    - 2 = Good match (relevant condition, likely meets criteria)
-    - 3 = Moderate match (somewhat relevant, may meet some criteria)
-    - 4 = Poor match (limited relevance, unlikely to meet criteria)
-    - 5 = No match (not relevant, clearly doesn't meet criteria)
-    
-    Consider:
-    - Condition/disease relevance and specificity
-    - Age and gender eligibility
-    - Geographic accessibility
-    - Trial phase appropriateness
-    - Current medications and potential conflicts
-    - Overall patient suitability
-    
-    Return a JSON array with objects containing:
-    {
-      "index": number,
-      "rank": number (1-5),
-      "reasoning": "brief explanation of ranking"
-    }
-    
-    Return only the JSON array, no additional text.
-  `;
+  const prompt = `Rank trials (1=excellent, 5=poor) for patient:
+Age: ${patientData.age || 'unknown'}, Conditions: ${patientData.conditions?.join(', ') || 'none'}, Location: ${patientData.location || 'unknown'}
+
+Trials: ${JSON.stringify(trialsData, null, 2)}`;
 
   try {
-    const responseText = await callGemini(prompt);
-    const rankings = JSON.parse(responseText) as Array<{
-      index: number;
-      rank: number;
-      reasoning: string;
-    }>;
-
-    // Apply rankings to trials and sort by rank (1 = best, 5 = worst)
-    const rankedTrials = trials.map((trial, index) => {
-      const ranking = rankings.find(r => r.index === index);
-      return {
-        ...trial,
-        aiRank: ranking?.rank || 5,
-        aiReasoning: ranking?.reasoning || 'No ranking provided',
-        // Convert rank to relevance score for backwards compatibility
-        relevanceScore: ranking ? (6 - ranking.rank) * 20 : 20 // 1->100, 2->80, 3->60, 4->40, 5->20
-      };
+    // Use Flash for ranking (it's faster and cheaper for this task)
+    const gemini = await getModel("gemini-2.5-flash");
+    
+    const result = await gemini.generateContent([{ text: prompt }], {
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: TRIAL_RANKING_SCHEMA
+      }
     });
 
-    // Sort by AI rank (1 = best match first)
-    return rankedTrials.sort((a, b) => (a.aiRank || 5) - (b.aiRank || 5));
-    
-  } catch (error) {
-    console.error('Error ranking clinical trials:', error);
-    // Fallback: return trials with default ranking
+    const rankings = JSON.parse(result.response.text());
+
+    return trials
+      .map((trial, i) => {
+        const rank = rankings.find((r: any) => r.index === i);
+        return {
+          ...trial,
+          aiRank: rank?.rank || 5,
+          aiReasoning: rank?.reasoning || 'No ranking',
+          relevanceScore: rank ? (6 - rank.rank) * 20 : 20
+        };
+      })
+      .sort((a, b) => (a.aiRank || 5) - (b.aiRank || 5));
+
+  } catch {
     return trials.map(trial => ({
       ...trial,
       aiRank: 3,
-      aiReasoning: 'AI ranking failed, using default',
+      aiReasoning: 'Ranking failed',
       relevanceScore: 60
     }));
   }
