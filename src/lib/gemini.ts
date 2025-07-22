@@ -1,6 +1,7 @@
-import { GoogleGenAI, Type } from '@google/genai';
 import { ClinicalTrial } from '@/models/clinical-trial';
 import { PatientData } from '@/models/patient';
+import { GoogleGenAI } from '@google/genai';
+import { PATIENT_DATA_SCHEMA, TRIAL_RANKING_SCHEMA } from './schemas';
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!
@@ -18,38 +19,6 @@ function getOptimalModel(transcript: string): string {
   }
 }
 
-const PATIENT_DATA_SCHEMA = {
-  type: Type.OBJECT,
-  properties: {
-    age: { type: Type.NUMBER },
-    conditions: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING }
-    },
-    medications: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING }
-    },
-    location: { type: Type.STRING },
-    gender: { type: Type.STRING },
-    medicalHistory: {
-      type: Type.ARRAY,
-      items: { type: Type.STRING }
-    }
-  }
-};
-
-const TRIAL_RANKING_SCHEMA = {
-  type: Type.ARRAY,
-  items: {
-    type: Type.OBJECT,
-    properties: {
-      index: { type: Type.NUMBER },
-      rank: { type: Type.NUMBER },
-      reasoning: { type: Type.STRING }
-    }
-  }
-};
 
 export async function extractPatientData(transcript: string): Promise<PatientData> {
   const modelName = getOptimalModel(transcript);
@@ -58,21 +27,15 @@ export async function extractPatientData(transcript: string): Promise<PatientDat
     model: modelName,
     contents: `Extract patient data from this medical conversation. Only include explicitly mentioned information:\n\n${transcript}`,
     config: {
-      responseMimeType: "application/json",
+      responseMimeType: "application/json" as const,
       responseSchema: PATIENT_DATA_SCHEMA
     }
   });
-
-  const data = JSON.parse(response.text);
-  
-  return {
-    age: data.age || undefined,
-    conditions: data.conditions || [],
-    medications: data.medications || [],
-    location: data.location || undefined,
-    gender: data.gender || undefined,
-    medicalHistory: data.medicalHistory || []
-  };
+  try {
+    return JSON.parse(response.text || '{}');
+  } catch (error) {
+    throw new Error(`Failed to parse patient data: ${error instanceof Error ? error.message  : ''}`);
+  }
 }
 
 export async function rankClinicalTrials(trials: ClinicalTrial[], patientData: PatientData): Promise<ClinicalTrial[]> {
@@ -83,7 +46,7 @@ export async function rankClinicalTrials(trials: ClinicalTrial[], patientData: P
     title: trial.briefTitle,
     conditions: trial.conditions || [],
     status: trial.overallStatus,
-    locations: trial.locations?.slice(0, 2) || []
+    locations: trial.locations || []
   }));
 
   const prompt = `Rank trials (1=excellent, 5=poor) for patient:
@@ -96,12 +59,16 @@ Trials: ${JSON.stringify(trialsData, null, 2)}`;
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
-        responseMimeType: "application/json",
+        responseMimeType: "application/json" as const,
         responseSchema: TRIAL_RANKING_SCHEMA
       }
     });
 
-    const rankings = JSON.parse(response.text);
+    const rankings = JSON.parse(response.text || '[]') as Array<{
+      index: number;
+      rank: number;
+      reasoning: string;
+    }>;
 
     return trials
       .map((trial, i) => {
@@ -109,8 +76,7 @@ Trials: ${JSON.stringify(trialsData, null, 2)}`;
         return {
           ...trial,
           aiRank: rank?.rank || 5,
-          aiReasoning: rank?.reasoning || 'No ranking',
-          relevanceScore: rank ? (6 - rank.rank) * 20 : 20
+          aiReasoning: rank?.reasoning || 'No ranking available'
         };
       })
       .sort((a, b) => (a.aiRank || 5) - (b.aiRank || 5));
@@ -119,8 +85,7 @@ Trials: ${JSON.stringify(trialsData, null, 2)}`;
     return trials.map(trial => ({
       ...trial,
       aiRank: 3,
-      aiReasoning: 'Ranking failed',
-      relevanceScore: 60
+      aiReasoning: 'AI ranking unavailable'
     }));
   }
 }

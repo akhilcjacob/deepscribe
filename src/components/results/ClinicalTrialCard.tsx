@@ -1,4 +1,4 @@
-import { ClinicalTrial } from '@/models/clinical-trial';
+import { ClinicalTrial, ClinicalTrialLocation } from '@/models/clinical-trial';
 import { Brain, ExternalLink, MapPin } from 'lucide-react';
 import { BentoCard } from '../BentoCard';
 
@@ -50,7 +50,7 @@ export function ClinicalTrialCard({ trial }: ClinicalTrialCardProps) {
           <div className="flex items-start gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div className="text-sm text-muted-foreground">
-              {trial.locations.slice(0, 2).map((location: any, index: number) => (
+              {trial.locations.slice(0, 2).map((location: ClinicalTrialLocation, index: number) => (
                 <div key={index}>
                   {location.facility} - {location.city}, {location.state}
                 </div>

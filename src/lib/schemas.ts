@@ -1,25 +1,34 @@
+import { Type } from "@google/genai";
+
 export const PATIENT_DATA_SCHEMA = {
-  type: "object",
+  type: Type.OBJECT,
   properties: {
-    age: { type: ["number", "null"] },
-    conditions: { type: "array", items: { type: "string" } },
-    medications: { type: "array", items: { type: "string" } },
-    location: { type: ["string", "null"] },
-    gender: { type: ["string", "null"] },
-    medicalHistory: { type: "array", items: { type: "string" } }
-  },
-  required: ["conditions", "medications", "medicalHistory"]
-} as const;
+    age: { type: Type.NUMBER },
+    conditions: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING }
+    },
+    medications: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING }
+    },
+    location: { type: Type.STRING },
+    gender: { type: Type.STRING },
+    medicalHistory: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING }
+    }
+  }
+};
 
 export const TRIAL_RANKING_SCHEMA = {
-  type: "array",
+  type: Type.ARRAY,
   items: {
-    type: "object",
+    type: Type.OBJECT,
     properties: {
-      index: { type: "number" },
-      rank: { type: "number", minimum: 1, maximum: 5 },
-      reasoning: { type: "string", maxLength: 200 }
-    },
-    required: ["index", "rank", "reasoning"]
+      index: { type: Type.NUMBER },
+      rank: { type: Type.NUMBER },
+      reasoning: { type: Type.STRING }
+    }
   }
-} as const;
+};

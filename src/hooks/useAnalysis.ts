@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { AnalysisResult } from '@/models';
+import { AnalysisResult } from '@/models/api';
 
 export function useAnalysis() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
