@@ -1,11 +1,19 @@
 # Clinical Trials Matcher
 
-> **Full-Stack AI Application** - Connecting patients with relevant clinical trials through intelligent conversation analysis
+> Connecting patients with relevant clinical trials through intelligent conversation analysis
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-blue?style=for-the-badge)](https://your-demo-url.vercel.app)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
-[![Gemini AI](https://img.shields.io/badge/AI-Gemini-orange?style=flat-square&logo=google)](https://ai.google.dev/)
+## Tech Stack
+
+- Next.js 15
+- React 19
+- TypeScript
+- Tailwind CSS
+- Google Gemini API
+- ClinicalTrials.gov API
+- Vercel (deployment)
+
+## Hosted
+[Web App](https://deepscribe-r4ur1bjq5-akhilcjacobpublic-gmailcoms-projects.vercel.app/)
 
 ## Overview
 
@@ -23,7 +31,6 @@ This application solves the challenge of connecting patients with relevant clini
 - **Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS
 - **AI:** Google Gemini API for data extraction and ranking
 - **External API:** ClinicalTrials.gov API for trial data
-- **Database:** Firebase Firestore (optional persistence)
 - **Deployment:** Vercel-ready
 
 ## Quick Start
@@ -31,7 +38,6 @@ This application solves the challenge of connecting patients with relevant clini
 ### Prerequisites
 - Node.js 18+ and npm
 - Google Gemini API key → [Get yours here](https://makersuite.google.com/app/apikey)
-- Firebase project (optional) → [Create one here](https://console.firebase.google.com/)
 
 ### Local Setup
 
@@ -144,9 +150,6 @@ src/
 
 ## Deployment
 
-### Vercel (One-Click)
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/deepscribe)
-
 ### Manual Deployment
 ```bash
 # Build for production
@@ -189,24 +192,14 @@ vercel env add GEMINI_API_KEY
 Potential enhancements for production deployment:
 
 ### Short-term
-- [ ] **Enhanced Error Handling** - Better user feedback for API failures
-- [ ] **Caching Layer** - Redis for frequently accessed trial data
-- [ ] **Analytics** - Track search patterns and success rates
+- [ ] **LLM Improvements** - Model Redundancy, and backup
+- [ ] **Trial Search Improvements** - Better filtration
+- [ ] **Enhanced Error Handling** - Better translation of errors to user
+- [ ] **User Authentication** - Auth N/Z
+- [ ] **Patient Data Storage** - Save and manage transcripts to a user
 - [ ] **Mobile Optimization** - PWA capabilities for mobile access
 
-### Medium-term
-- [ ] **Multi-language Support** - International transcript processing
-- [ ] **Provider Dashboard** - Interface for healthcare professionals
-- [ ] **Patient Profiles** - Save and manage multiple analyses
-- [ ] **Trial Notifications** - Alert system for new matching trials
-
 ### Long-term
-- [ ] **EHR Integration** - Direct connection to electronic health records
-- [ ] **Outcome Tracking** - Monitor patient enrollment and outcomes
 - [ ] **ML Improvements** - Custom models for better medical entity extraction
 - [ ] **Regulatory Compliance** - HIPAA and other healthcare standards
 
----
-
-**Built for the Clinical Trials Matching Challenge**  
-*Demonstrating full-stack development, AI integration, and healthcare domain expertise*
