@@ -1,4 +1,4 @@
-import { PatientData } from '@/models';
+import { PatientData } from '@/models/patient';
 import { Activity, Calendar, FlaskConical, MapPin, User } from 'lucide-react';
 import { BentoCard } from '../BentoCard';
 

@@ -1,158 +1,106 @@
-<div align="center">
-  <h1>🏥 Clinical Trials Matcher</h1>
-  <p><strong>AI-Powered Clinical Trial Discovery Platform</strong></p>
-  
-  <p>Transform patient-doctor conversations into personalized clinical trial recommendations using advanced AI and real-time data from ClinicalTrials.gov</p>
-  
-  <p>
-    <a href="#-demo">View Demo</a> •
-    <a href="#-quick-start">Quick Start</a> •
-    <a href="#-features">Features</a> •
-    <a href="#-api-reference">API</a>
-  </p>
-  
-  <img src="https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js" alt="Next.js">
-  <img src="https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react" alt="React">
-  <img src="https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Tailwind-4-teal?style=flat-square&logo=tailwindcss" alt="Tailwind">
-  <img src="https://img.shields.io/badge/AI-Gemini-orange?style=flat-square&logo=google" alt="Gemini AI">
-</div>
+# Clinical Trials Matcher
 
----
+> **Full-Stack AI Application** - Connecting patients with relevant clinical trials through intelligent conversation analysis
 
-## 🎯 What It Does
+[![Live Demo](https://img.shields.io/badge/Live-Demo-blue?style=for-the-badge)](https://your-demo-url.vercel.app)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Gemini AI](https://img.shields.io/badge/AI-Gemini-orange?style=flat-square&logo=google)](https://ai.google.dev/)
 
-This application bridges the gap between patient conversations and clinical trial opportunities by:
+## Overview
 
-| Step | Process | Technology |
-|------|---------|------------|
-| 📝 | **Transcript Input** | Natural language processing |
-| 🧠 | **AI Analysis** | Google Gemini extracts patient data |
-| 🔍 | **Trial Search** | ClinicalTrials.gov API integration |
-| 📊 | **Smart Ranking** | Relevance scoring algorithm |
-| 💡 | **Results Display** | Clean, intuitive interface |
+This application solves the challenge of connecting patients with relevant clinical trials by analyzing patient-doctor conversation transcripts using AI and matching them with trials from ClinicalTrials.gov.
 
-## ✨ Features
+**Core Workflow:**
+1. **Input** - Patient-doctor conversation transcript
+2. **Extract** - AI extracts structured patient data (demographics, conditions, location)
+3. **Search** - Query ClinicalTrials.gov API with extracted criteria
+4. **Rank** - AI-powered relevance scoring of trial matches
+5. **Display** - Clean interface showing patient data and ranked trials
 
-### 🤖 **AI-Powered Data Extraction**
-- Extracts patient demographics, conditions, and medical history
-- Handles natural language variations and medical terminology
-- Structured output for precise trial matching
+## Technology Stack
 
-### 🎯 **Intelligent Trial Matching**
-- Real-time search across 400,000+ clinical trials
-- Multi-criteria relevance scoring
-- Geographic proximity consideration
-- Age and condition-based filtering
+- **Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS
+- **AI:** Google Gemini API for data extraction and ranking
+- **External API:** ClinicalTrials.gov API for trial data
+- **Database:** Firebase Firestore (optional persistence)
+- **Deployment:** Vercel-ready
 
-### 🎨 **Modern User Experience**
-- Clean, responsive design
-- Two-column results layout
-- Sample data for easy testing
-- Direct links to trial details
-
-### 🔧 **Developer-Friendly**
-- Full TypeScript support
-- Modular architecture
-- Comprehensive API documentation
-- Easy deployment options
-
-## 🛠 Technology Stack
-
-<table>
-  <tr>
-    <td><strong>Frontend</strong></td>
-    <td>Next.js 15, React 19, TypeScript, Tailwind CSS</td>
-  </tr>
-  <tr>
-    <td><strong>AI & APIs</strong></td>
-    <td>Google Gemini API, ClinicalTrials.gov API</td>
-  </tr>
-  <tr>
-    <td><strong>Database</strong></td>
-    <td>Firebase Firestore (optional)</td>
-  </tr>
-  <tr>
-    <td><strong>Deployment</strong></td>
-    <td>Vercel, Netlify, or any Node.js platform</td>
-  </tr>
-</table>
-
-## Getting Started
+## Quick Start
 
 ### Prerequisites
-
 - Node.js 18+ and npm
-- Google Gemini API key ([Get one here](https://makersuite.google.com/app/apikey))
-- Firebase project ([Create one here](https://console.firebase.google.com/))
+- Google Gemini API key → [Get yours here](https://makersuite.google.com/app/apikey)
+- Firebase project (optional) → [Create one here](https://console.firebase.google.com/)
 
-### Installation
+### Local Setup
 
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd deepscribe
-   ```
+```bash
+# Clone and install
+git clone <repository-url>
+cd deepscribe
+npm install
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+# Environment setup
+cp .env.example .env.local
+# Edit .env.local with your Gemini API key:
+# GEMINI_API_KEY=your_api_key_here
 
-3. **Set up environment variables**:
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Edit `.env.local` and add your API keys:
-   ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
-   
-   NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
-   NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abcdef123456
-   ```
+# Run locally
+npm run dev
+# Open http://localhost:3000
+```
 
-4. **Run the development server**:
-   ```bash
-   npm run dev
-   ```
+### Try the Demo
+1. Click "Load Sample Transcript" for a realistic patient conversation
+2. Click "Analyze & Find Trials" to see AI extraction and trial matching
+3. Explore the results showing patient data and ranked clinical trials
 
-5. **Open the application**:
-   Visit [http://localhost:3000](http://localhost:3000) in your browser
+## How It Works
 
-## Usage
+### 1. Transcript Processing
+The application accepts patient-doctor conversation transcripts and uses Google Gemini to extract:
+- Patient demographics (age, gender, location)
+- Medical conditions and diagnoses
+- Current medications and treatments
+- Relevant medical history
 
-1. **Load Sample Data**: Click "Load Sample Transcript" to populate the text area with a realistic patient-doctor conversation
-2. **Enter Custom Transcript**: Or paste your own medical conversation transcript
-3. **Analyze**: Click "Analyze & Find Trials" to process the transcript
-4. **Review Results**: View the extracted patient data and matching clinical trials
-5. **Explore Trials**: Click on trial links to view detailed information on ClinicalTrials.gov
+### 2. Clinical Trial Search
+Extracted data is used to query ClinicalTrials.gov API with:
+- Condition-based filtering with medical synonyms
+- Geographic location matching
+- Age and gender eligibility criteria
+- Active/recruiting trial status
 
-## API Endpoints
+### 3. AI-Powered Ranking
+Trials are scored using multiple factors:
+- Condition relevance and medical terminology matching
+- Geographic proximity to patient location
+- Age eligibility and demographic fit
+- Trial phase and recruitment status
+- AI assessment of overall patient-trial compatibility
 
-### POST `/api/analyze`
+## API Reference
 
-Analyzes a patient-doctor transcript and returns structured data with matching clinical trials.
+### `POST /api/analyze`
 
-**Request Body**:
+Main endpoint that processes transcripts and returns matching trials.
+
+**Request:**
 ```json
 {
-  "transcript": "Doctor: Good morning, Mrs. Johnson..."
+  "transcript": "Doctor: Good morning, Mrs. Johnson. How are you feeling today?..."
 }
 ```
 
-**Response**:
+**Response:**
 ```json
 {
   "success": true,
   "data": {
     "patientData": {
       "age": 58,
-      "conditions": ["non-small cell lung cancer", "adenocarcinoma"],
+      "conditions": ["non-small cell lung cancer"],
       "location": "St. Louis, Missouri",
       "gender": "female"
     },
@@ -162,86 +110,103 @@ Analyzes a patient-doctor transcript and returns structured data with matching c
         "briefTitle": "Study of New Treatment for Lung Cancer",
         "overallStatus": "RECRUITING",
         "relevanceScore": 25,
-        "locations": [...],
-        "conditions": [...]
+        "aiRank": 1
       }
     ]
   }
 }
 ```
 
-## Architecture
+## Project Structure
 
-### Core Components
+```
+src/
+├── app/
+│   ├── api/analyze/          # Main API endpoint
+│   └── page.tsx             # Frontend interface
+├── lib/
+│   ├── gemini.ts           # AI data extraction
+│   ├── clinical-trials.ts  # Trial search & scoring
+│   └── firebase.ts         # Optional persistence
+├── models/
+│   └── *.ts               # TypeScript interfaces
+└── components/
+    └── *.tsx              # UI components
+```
 
-- **`/src/lib/gemini.ts`**: Google Gemini AI integration for data extraction
-- **`/src/lib/clinical-trials.ts`**: ClinicalTrials.gov API client with relevance scoring
-- **`/src/lib/firebase.ts`**: Firebase Firestore integration with fallback support
-- **`/src/app/api/analyze/route.ts`**: Main API endpoint orchestrating the workflow
-- **`/src/app/page.tsx`**: React frontend component
-- **`/src/models/`**: TypeScript interfaces and types for all data models
+### Key Design Decisions
 
-### Data Flow
-
-1. User submits transcript via frontend
-2. API endpoint receives transcript
-3. Gemini extracts structured patient data
-4. ClinicalTrials.gov API is queried with patient data
-5. Results are scored and ranked
-6. Data is optionally saved to Firebase
-7. Results are returned to frontend for display
+- **Next.js Full-Stack**: Single codebase for frontend and API
+- **TypeScript**: Type safety across all components
+- **Modular Architecture**: Separate services for AI, trials, and data
+- **Component-Based UI**: Reusable React components with Tailwind
+- **AI-First Approach**: Gemini handles both extraction and ranking
 
 ## Deployment
 
-### Vercel (Recommended)
+### Vercel (One-Click)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/deepscribe)
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy automatically
+### Manual Deployment
+```bash
+# Build for production
+npm run build
 
-### Other Platforms
+# Deploy to Vercel
+npm i -g vercel
+vercel --prod
 
-The application can be deployed to any platform supporting Next.js:
-- Netlify
-- Railway
-- AWS Amplify
-- Google Cloud Run
+# Add environment variables
+vercel env add GEMINI_API_KEY
+```
 
-## Configuration
+**Other Platforms:** Netlify, Railway, AWS Amplify (all support Next.js)
 
-### Environment Variables
+## Key Features & Innovations
 
-- `GEMINI_API_KEY` (Required): Google Gemini API key
-- Firebase variables (Optional): For data persistence
+### AI Enhancements
+- **Smart Data Extraction**: Handles medical terminology and conversational language
+- **Synonym Expansion**: Automatically includes medical condition variations
+- **Relevance Ranking**: AI scores trials based on multiple compatibility factors
+- **Quality Filtering**: Only shows high-relevance matches (ranks 1-3)
 
-### Customization
+### Technical Highlights
+- **Comprehensive Search**: Queries 400K+ trials with expanded criteria
+- **Real-time Processing**: Fast API responses with efficient data handling
+- **Error Handling**: Graceful fallbacks and user-friendly error messages
+- **Responsive Design**: Works seamlessly on desktop and mobile
 
-- **Scoring Algorithm**: Modify `calculateRelevanceScore()` in `clinical-trials.ts`
-- **Data Extraction**: Adjust the Gemini prompt in `gemini.ts`
-- **UI Components**: Customize the interface in `page.tsx`
-- **API Parameters**: Modify ClinicalTrials.gov query parameters
+## Development Assumptions
 
-## Assumptions & Limitations
+- **Language**: English transcripts with standard medical terminology
+- **Geography**: US-based trials and patient locations
+- **Data Quality**: Clear patient information in conversation transcripts
+- **Demo Purpose**: Not intended for actual clinical decision-making
+- **API Limits**: Reasonable usage within rate limits
 
-- **API Rate Limits**: Both Gemini and ClinicalTrials.gov have rate limits
-- **Data Quality**: Results depend on transcript quality and completeness
-- **Geographic Scope**: Currently optimized for US-based trials
-- **Medical Accuracy**: This is a demonstration tool, not for actual medical use
-- **Privacy**: No PHI validation or HIPAA compliance implemented
+## Next Steps
 
-## Future Enhancements
+Potential enhancements for production deployment:
 
-- **Multi-language Support**: Support for non-English transcripts
-- **Advanced Filtering**: More sophisticated trial matching criteria
-- **Patient Dashboard**: Save and manage multiple analyses
-- **Provider Integration**: Direct integration with EHR systems
-- **Notification System**: Alert patients about new matching trials
+### Short-term
+- [ ] **Enhanced Error Handling** - Better user feedback for API failures
+- [ ] **Caching Layer** - Redis for frequently accessed trial data
+- [ ] **Analytics** - Track search patterns and success rates
+- [ ] **Mobile Optimization** - PWA capabilities for mobile access
 
-## Contributing
+### Medium-term
+- [ ] **Multi-language Support** - International transcript processing
+- [ ] **Provider Dashboard** - Interface for healthcare professionals
+- [ ] **Patient Profiles** - Save and manage multiple analyses
+- [ ] **Trial Notifications** - Alert system for new matching trials
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+### Long-term
+- [ ] **EHR Integration** - Direct connection to electronic health records
+- [ ] **Outcome Tracking** - Monitor patient enrollment and outcomes
+- [ ] **ML Improvements** - Custom models for better medical entity extraction
+- [ ] **Regulatory Compliance** - HIPAA and other healthcare standards
 
-## License
+---
 
-This project is licensed under the MIT License.
+**Built for the Clinical Trials Matching Challenge**  
+*Demonstrating full-stack development, AI integration, and healthcare domain expertise*

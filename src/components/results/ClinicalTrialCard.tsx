@@ -1,5 +1,5 @@
-import { MapPin, Brain, ExternalLink } from 'lucide-react';
-import { ClinicalTrial } from '@/models';
+import { ClinicalTrial } from '@/models/clinical-trial';
+import { Brain, ExternalLink, MapPin } from 'lucide-react';
 import { BentoCard } from '../BentoCard';
 
 interface ClinicalTrialCardProps {
@@ -50,7 +50,7 @@ export function ClinicalTrialCard({ trial }: ClinicalTrialCardProps) {
           <div className="flex items-start gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div className="text-sm text-muted-foreground">
-              {trial.locations.slice(0, 2).map((location, index) => (
+              {trial.locations.slice(0, 2).map((location: any, index: number) => (
                 <div key={index}>
                   {location.facility} - {location.city}, {location.state}
                 </div>
@@ -63,15 +63,12 @@ export function ClinicalTrialCard({ trial }: ClinicalTrialCardProps) {
         )}
         
         {trial.aiReasoning && (
-          <div className="pt-3 border-t border-border">
+          <div className="mt-4 p-3 bg-primary/10 rounded-lg">
             <div className="flex items-start gap-2">
-              <Brain className="h-4 w-4 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-foreground mb-1">Analysis</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {trial.aiReasoning}
-                </p>
-              </div>
+              <Brain className="h-4 w-4 text-white mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-white leading-relaxed">
+                {trial.aiReasoning}
+              </p>
             </div>
           </div>
         )}
