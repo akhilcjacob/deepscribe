@@ -1,4 +1,4 @@
-import { MapPin, Calendar, Activity, Brain, ExternalLink } from 'lucide-react';
+import { MapPin, Brain, ExternalLink } from 'lucide-react';
 import { ClinicalTrial } from '@/models';
 import { BentoCard } from '../BentoCard';
 

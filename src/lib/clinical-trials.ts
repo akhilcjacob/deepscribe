@@ -1,5 +1,21 @@
-import { ClinicalTrial, ClinicalTrialsResponse, PatientData } from '@/models';
+import { ClinicalTrial } from '@/models/clinical-trial';
+import { PatientData } from '@/models/patient';
 import { rankClinicalTrials } from './gemini';
+
+interface ClinicalTrialAPIResponse {
+  studies?: Array<{
+    protocolSection?: {
+      identificationModule?: Record<string, unknown>;
+      statusModule?: Record<string, unknown>;
+      descriptionModule?: Record<string, unknown>;
+      conditionsModule?: Record<string, unknown>;
+      armsInterventionsModule?: Record<string, unknown>;
+      contactsLocationsModule?: Record<string, unknown>;
+      eligibilityModule?: Record<string, unknown>;
+      designModule?: Record<string, unknown>;
+    };
+  }>;
+}
 
 export async function searchClinicalTrials(patientData: PatientData): Promise<ClinicalTrial[]> {
   const baseUrl = 'https://clinicaltrials.gov/api/v2/studies';
@@ -34,14 +50,14 @@ export async function searchClinicalTrials(patientData: PatientData): Promise<Cl
       throw new Error(`ClinicalTrials.gov API error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as ClinicalTrialAPIResponse;
     
     if (!data.studies) {
       return [];
     }
 
     // Transform the API response to our interface
-    const trials: ClinicalTrial[] = data.studies.map((study: any) => {
+    const trials: ClinicalTrial[] = data.studies.map((study) => {
       const protocolSection = study.protocolSection || {};
       const identificationModule = protocolSection.identificationModule || {};
       const statusModule = protocolSection.statusModule || {};
@@ -53,29 +69,29 @@ export async function searchClinicalTrials(patientData: PatientData): Promise<Cl
       const designModule = protocolSection.designModule || {};
 
       return {
-        nctId: identificationModule.nctId || '',
-        briefTitle: identificationModule.briefTitle || '',
-        officialTitle: identificationModule.officialTitle,
-        briefSummary: descriptionModule.briefSummary,
-        detailedDescription: descriptionModule.detailedDescription,
-        overallStatus: statusModule.overallStatus || '',
-        phase: designModule.phases || [],
-        studyType: designModule.studyType || '',
-        conditions: conditionsModule.conditions || [],
-        interventions: armsInterventionsModule.interventions?.map((intervention: any) => ({
+        nctId: (identificationModule.nctId as string) || '',
+        briefTitle: (identificationModule.briefTitle as string) || '',
+        officialTitle: identificationModule.officialTitle as string | undefined,
+        briefSummary: descriptionModule.briefSummary as string | undefined,
+        detailedDescription: descriptionModule.detailedDescription as string | undefined,
+        overallStatus: (statusModule.overallStatus as string) || '',
+        phase: (designModule.phases as string[]) || [],
+        studyType: (designModule.studyType as string) || '',
+        conditions: (conditionsModule.conditions as string[]) || [],
+        interventions: ((armsInterventionsModule.interventions as Array<{ type?: string; name?: string }>) || []).map((intervention) => ({
           type: intervention.type || '',
           name: intervention.name || ''
-        })) || [],
-        locations: contactsLocationsModule.locations?.map((location: any) => ({
+        })),
+        locations: ((contactsLocationsModule.locations as Array<{ facility?: string; city?: string; state?: string; country?: string }>) || []).map((location) => ({
           facility: location.facility || '',
           city: location.city || '',
           state: location.state || '',
           country: location.country || ''
-        })) || [],
-        eligibilityCriteria: eligibilityModule.eligibilityCriteria,
-        minimumAge: eligibilityModule.minimumAge,
-        maximumAge: eligibilityModule.maximumAge,
-        gender: eligibilityModule.sex || 'ALL'
+        })),
+        eligibilityCriteria: eligibilityModule.eligibilityCriteria as string | undefined,
+        minimumAge: eligibilityModule.minimumAge as string | undefined,
+        maximumAge: eligibilityModule.maximumAge as string | undefined,
+        gender: (eligibilityModule.sex as string) || 'ALL'
       };
     });
 

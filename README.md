@@ -1,32 +1,82 @@
-# Clinical Trials Matcher
+<div align="center">
+  <h1>🏥 Clinical Trials Matcher</h1>
+  <p><strong>AI-Powered Clinical Trial Discovery Platform</strong></p>
+  
+  <p>Transform patient-doctor conversations into personalized clinical trial recommendations using advanced AI and real-time data from ClinicalTrials.gov</p>
+  
+  <p>
+    <a href="#-demo">View Demo</a> •
+    <a href="#-quick-start">Quick Start</a> •
+    <a href="#-features">Features</a> •
+    <a href="#-api-reference">API</a>
+  </p>
+  
+  <img src="https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js" alt="Next.js">
+  <img src="https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Tailwind-4-teal?style=flat-square&logo=tailwindcss" alt="Tailwind">
+  <img src="https://img.shields.io/badge/AI-Gemini-orange?style=flat-square&logo=google" alt="Gemini AI">
+</div>
 
-An AI-powered web application that analyzes patient-doctor conversation transcripts to extract structured patient data and match patients with relevant clinical trials from ClinicalTrials.gov.
+---
 
-## Overview
+## 🎯 What It Does
 
-This application demonstrates the intersection of AI and healthcare by:
+This application bridges the gap between patient conversations and clinical trial opportunities by:
 
-1. **Transcript Analysis**: Uses Google Gemini AI to extract structured patient data (age, conditions, medications, location) from unstructured conversation transcripts
-2. **Clinical Trial Matching**: Queries the ClinicalTrials.gov API to find recruiting trials that match the patient's profile
-3. **Intelligent Scoring**: Calculates relevance scores based on condition matches, location proximity, age eligibility, and other factors
-4. **User-Friendly Interface**: Displays results in a clean, two-column layout with extracted patient data and ranked trial matches
+| Step | Process | Technology |
+|------|---------|------------|
+| 📝 | **Transcript Input** | Natural language processing |
+| 🧠 | **AI Analysis** | Google Gemini extracts patient data |
+| 🔍 | **Trial Search** | ClinicalTrials.gov API integration |
+| 📊 | **Smart Ranking** | Relevance scoring algorithm |
+| 💡 | **Results Display** | Clean, intuitive interface |
 
-## Features
+## ✨ Features
 
-- **AI-Powered Data Extraction**: Leverages Google Gemini to parse medical conversations
-- **Real-Time Trial Search**: Integrates with ClinicalTrials.gov public API
-- **Smart Relevance Scoring**: Ranks trials based on multiple matching criteria
-- **Sample Data**: Includes a realistic patient-doctor conversation for testing
-- **Responsive Design**: Modern UI built with Tailwind CSS and Lucide icons
-- **Firebase Integration**: Real-time data persistence with fallback support
+### 🤖 **AI-Powered Data Extraction**
+- Extracts patient demographics, conditions, and medical history
+- Handles natural language variations and medical terminology
+- Structured output for precise trial matching
 
-## Technology Stack
+### 🎯 **Intelligent Trial Matching**
+- Real-time search across 400,000+ clinical trials
+- Multi-criteria relevance scoring
+- Geographic proximity consideration
+- Age and condition-based filtering
 
-- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
-- **AI Integration**: Google Gemini API
-- **External APIs**: ClinicalTrials.gov API
-- **Database**: Firebase Firestore
-- **Deployment**: Vercel-ready
+### 🎨 **Modern User Experience**
+- Clean, responsive design
+- Two-column results layout
+- Sample data for easy testing
+- Direct links to trial details
+
+### 🔧 **Developer-Friendly**
+- Full TypeScript support
+- Modular architecture
+- Comprehensive API documentation
+- Easy deployment options
+
+## 🛠 Technology Stack
+
+<table>
+  <tr>
+    <td><strong>Frontend</strong></td>
+    <td>Next.js 15, React 19, TypeScript, Tailwind CSS</td>
+  </tr>
+  <tr>
+    <td><strong>AI & APIs</strong></td>
+    <td>Google Gemini API, ClinicalTrials.gov API</td>
+  </tr>
+  <tr>
+    <td><strong>Database</strong></td>
+    <td>Firebase Firestore (optional)</td>
+  </tr>
+  <tr>
+    <td><strong>Deployment</strong></td>
+    <td>Vercel, Netlify, or any Node.js platform</td>
+  </tr>
+</table>
 
 ## Getting Started
 

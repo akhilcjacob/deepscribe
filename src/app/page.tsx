@@ -1,68 +1,8 @@
 'use client';
 
-import { TranscriptInput } from '@/components/forms/TranscriptInput';
-import { ResultsContainer } from '@/components/results';
-import { Header } from '@/components/ui';
-import { useAnalysis } from '@/hooks';
-import { ArrowLeft } from 'lucide-react';
-
-function ResultsView({ result, onBack }: { result: any; onBack: () => void }) {
-  return (
-    <div className="min-h-screen px-4 py-8">
-      <div className="w-full max-w-6xl mx-auto">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 px-4 py-2 text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-secondary mb-6"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Input
-        </button>
-        
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-semibold text-foreground mb-3">Analysis Results</h1>
-          <p className="text-muted-foreground">Patient data extraction and clinical trial matching</p>
-        </div>
-
-        <ResultsContainer result={result} />
-      </div>
-    </div>
-  );
-}
-
-function InputView({ 
-  onAnalyze, 
-  isLoading, 
-  error, 
-  transcript, 
-  onClear 
-}: { 
-  onAnalyze: (transcript: string) => void; 
-  isLoading: boolean; 
-  error: string | null; 
-  transcript: string; 
-  onClear: () => void;
-}) {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-4xl mx-auto">
-        <Header />
-        
-        <TranscriptInput 
-          onAnalyze={onAnalyze}
-          isLoading={isLoading}
-          value={transcript}
-          onClear={onClear}
-        />
-        
-        {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800">{error}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+import { InputView } from '@/components/views/InputView';
+import { ResultsView } from '@/components/views/ResultsView';
+import { useAnalysis } from '@/hooks/useAnalysis';
 
 export default function Home() {
   const { result, isLoading, error, transcript, analyzeTranscript, clearResults, clearInput } = useAnalysis();

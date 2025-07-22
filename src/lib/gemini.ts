@@ -1,7 +1,10 @@
-import { ClinicalTrial, PatientData } from '@/models';
-import { PATIENT_DATA_SCHEMA, TRIAL_RANKING_SCHEMA } from './schemas';
+import { GoogleGenAI, Type } from '@google/genai';
+import { ClinicalTrial } from '@/models/clinical-trial';
+import { PatientData } from '@/models/patient';
 
-let models: Record<string, any> = {};
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY!
+});
 
 function getOptimalModel(transcript: string): string {
   const tokenEstimate = transcript.length / 4;
@@ -15,29 +18,52 @@ function getOptimalModel(transcript: string): string {
   }
 }
 
-async function getModel(modelName: string) {
-  if (!models[modelName]) {
-    const { GoogleGenerativeAI } = await import('@google/generative-ai');
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-    models[modelName] = genAI.getGenerativeModel({ model: modelName });
+const PATIENT_DATA_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    age: { type: Type.NUMBER },
+    conditions: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING }
+    },
+    medications: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING }
+    },
+    location: { type: Type.STRING },
+    gender: { type: Type.STRING },
+    medicalHistory: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING }
+    }
   }
-  return models[modelName];
-}
+};
+
+const TRIAL_RANKING_SCHEMA = {
+  type: Type.ARRAY,
+  items: {
+    type: Type.OBJECT,
+    properties: {
+      index: { type: Type.NUMBER },
+      rank: { type: Type.NUMBER },
+      reasoning: { type: Type.STRING }
+    }
+  }
+};
 
 export async function extractPatientData(transcript: string): Promise<PatientData> {
-  const modelName = getOptimalModel(transcript); // Smart model selection!
-  const gemini = await getModel(modelName);
+  const modelName = getOptimalModel(transcript);
   
-  const result = await gemini.generateContent([
-    { text: `Extract patient data from this medical conversation. Only include explicitly mentioned information:\n\n${transcript}` }
-  ], {
-    generationConfig: {
+  const response = await ai.models.generateContent({
+    model: modelName,
+    contents: `Extract patient data from this medical conversation. Only include explicitly mentioned information:\n\n${transcript}`,
+    config: {
       responseMimeType: "application/json",
       responseSchema: PATIENT_DATA_SCHEMA
     }
   });
 
-  const data = JSON.parse(result.response.text());
+  const data = JSON.parse(response.text);
   
   return {
     age: data.age || undefined,
@@ -66,21 +92,20 @@ Age: ${patientData.age || 'unknown'}, Conditions: ${patientData.conditions?.join
 Trials: ${JSON.stringify(trialsData, null, 2)}`;
 
   try {
-    // Use Flash for ranking (it's faster and cheaper for this task)
-    const gemini = await getModel("gemini-2.5-flash");
-    
-    const result = await gemini.generateContent([{ text: prompt }], {
-      generationConfig: {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
         responseMimeType: "application/json",
         responseSchema: TRIAL_RANKING_SCHEMA
       }
     });
 
-    const rankings = JSON.parse(result.response.text());
+    const rankings = JSON.parse(response.text);
 
     return trials
       .map((trial, i) => {
-        const rank = rankings.find((r: any) => r.index === i);
+        const rank = rankings.find(r => r.index === i);
         return {
           ...trial,
           aiRank: rank?.rank || 5,

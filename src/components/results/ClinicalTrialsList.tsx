@@ -1,6 +1,6 @@
-import { ClinicalTrial } from '@/models';
-import { ClinicalTrialCard } from './ClinicalTrialCard';
+import { ClinicalTrial } from '@/models/clinical-trial';
 import { BentoCard } from '../BentoCard';
+import { ClinicalTrialCard } from './ClinicalTrialCard';
 
 interface ClinicalTrialsListProps {
   trials: ClinicalTrial[];

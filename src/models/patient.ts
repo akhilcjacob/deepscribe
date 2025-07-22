@@ -1,6 +1,6 @@
 export interface PatientData {
   age?: number;
-  conditions: string[];
+  conditions?: string[];
   medications?: string[];
   location?: string;
   gender?: string;
