@@ -2,126 +2,126 @@ import { ClinicalTrial } from '@/models/clinical-trial';
 import { PatientData } from '@/models/patient';
 import { rankClinicalTrials } from './gemini';
 
-interface ClinicalTrialAPIResponse {
-  studies?: Array<{
-    protocolSection?: {
-      identificationModule?: Record<string, unknown>;
-      statusModule?: Record<string, unknown>;
-      descriptionModule?: Record<string, unknown>;
-      conditionsModule?: Record<string, unknown>;
-      armsInterventionsModule?: Record<string, unknown>;
-      contactsLocationsModule?: Record<string, unknown>;
-      eligibilityModule?: Record<string, unknown>;
-      designModule?: Record<string, unknown>;
+// Constants for API parameters
+const API_BASE_URL = 'https://clinicaltrials.gov/api/v2/studies';
+const PAGE_SIZE = '30'; // Fetch a reasonable number for the AI to rank.
+const ACTIVE_STATUSES = 'RECRUITING,ACTIVE_NOT_RECRUITING';
+const API_FIELDS = [
+  'NCTId', 'BriefTitle', 'OfficialTitle', 'BriefSummary', 
+  'OverallStatus', 'Phase', 'StudyType', 'Condition', 'InterventionName', 
+  'InterventionType', 'LocationFacility', 'LocationCity', 'LocationState', 
+  'LocationCountry', 'EligibilityCriteria', 'MinimumAge', 'MaximumAge', 'Gender'
+].join(',');
+
+// More specific types for the ClinicalTrials.gov API response
+interface Study {
+  protocolSection: {
+    identificationModule: {
+      nctId: string;
+      briefTitle: string;
+      officialTitle?: string;
     };
-  }>;
+    statusModule: {
+      overallStatus: string;
+    };
+    descriptionModule?: {
+      briefSummary?: string;
+      detailedDescription?: string;
+    };
+    conditionsModule?: {
+      conditions?: string[];
+    };
+    armsInterventionsModule?: {
+      interventions?: {
+        type: string;
+        name: string;
+      }[];
+    };
+    contactsLocationsModule?: {
+      locations?: {
+        facility: string;
+        city: string;
+        state: string;
+        country: string;
+      }[];
+    };
+    eligibilityModule?: {
+      eligibilityCriteria?: string;
+      minimumAge?: string;
+      maximumAge?: string;
+      sex?: string;
+    };
+    designModule: {
+      studyType: string;
+      phases?: string[];
+    };
+  };
+}
+
+interface ClinicalTrialAPIResponse {
+  studies: Study[];
+}
+
+/**
+ * Transforms a study from the ClinicalTrials.gov API into our internal ClinicalTrial model.
+ * @param study The study object from the API.
+ * @returns A formatted ClinicalTrial object.
+ */
+function transformStudyToClinicalTrial(study: Study): ClinicalTrial {
+  const p = study.protocolSection;
+  return {
+    nctId: p.identificationModule.nctId,
+    briefTitle: p.identificationModule.briefTitle,
+    officialTitle: p.identificationModule.officialTitle,
+    briefSummary: p.descriptionModule?.briefSummary,
+    detailedDescription: p.descriptionModule?.detailedDescription,
+    overallStatus: p.statusModule.overallStatus,
+    phase: p.designModule.phases || [],
+    studyType: p.designModule.studyType,
+    conditions: p.conditionsModule?.conditions || [],
+    interventions: p.armsInterventionsModule?.interventions || [],
+    locations: p.contactsLocationsModule?.locations || [],
+    eligibilityCriteria: p.eligibilityModule?.eligibilityCriteria,
+    minimumAge: p.eligibilityModule?.minimumAge,
+    maximumAge: p.eligibilityModule?.maximumAge,
+    gender: p.eligibilityModule?.sex || 'ALL',
+  };
 }
 
 export async function searchClinicalTrials(patientData: PatientData): Promise<ClinicalTrial[]> {
-  const baseUrl = 'https://clinicaltrials.gov/api/v2/studies';
-  const params = new URLSearchParams();
+  const params = new URLSearchParams({
+    fields: API_FIELDS,
+    pageSize: PAGE_SIZE,
+    'filter.overallStatus': ACTIVE_STATUSES,
+  });
 
-  // Build comprehensive search query
-  const searchTerms: string[] = [];
-  
-  // Add conditions with broader search terms
-  if (patientData.conditions && patientData.conditions.length > 0) {
-    patientData.conditions.forEach(condition => {
-      // Add exact condition
-      searchTerms.push(condition);
-      // Add common variations and synonyms
-      if (condition.toLowerCase().includes('diabetes')) {
-        searchTerms.push('diabetes mellitus', 'diabetic', 'T2DM', 'type 2 diabetes');
-      }
-      if (condition.toLowerCase().includes('hypertension')) {
-        searchTerms.push('high blood pressure', 'HTN', 'hypertensive');
-      }
-      if (condition.toLowerCase().includes('cancer')) {
-        searchTerms.push('tumor', 'neoplasm', 'malignancy', 'oncology');
-      }
-    });
-    
-    const conditionsQuery = [...new Set(searchTerms)].join(' OR ');
-    params.append('query.cond', conditionsQuery);
+  // Let the API handle condition searching. The AI ranking step will provide the nuanced matching.
+  if (patientData.conditions?.length) {
+    params.append('query.cond', patientData.conditions.join(' OR '));
   }
 
-  // Add location with broader search
+  // Add location if available.
   if (patientData.location) {
     params.append('query.locn', patientData.location);
-    // Also search nearby areas for better coverage
-    const locationParts = patientData.location.split(',');
-    if (locationParts.length > 1) {
-      params.append('query.locn', locationParts[locationParts.length - 1].trim()); // State/Country
-    }
   }
 
-  // Include recruiting and active studies
-  params.append('filter.overallStatus', 'RECRUITING,ACTIVE_NOT_RECRUITING');
-  
-  // Increase results for better AI ranking
-  params.append('pageSize', '50');
-  
-  // Request comprehensive fields for better AI analysis
-  params.append('fields', 'NCTId,BriefTitle,OfficialTitle,BriefSummary,DetailedDescription,OverallStatus,Phase,StudyType,Condition,InterventionName,InterventionType,LocationFacility,LocationCity,LocationState,LocationCountry,EligibilityCriteria,MinimumAge,MaximumAge,Gender,Keyword,PrimaryOutcome,SecondaryOutcome');
-
-  const url = `${baseUrl}?${params.toString()}`;
+  const url = `${API_BASE_URL}?${params.toString()}`;
 
   try {
     const response = await fetch(url);
-    
     if (!response.ok) {
-      throw new Error(`ClinicalTrials.gov API error: ${response.status}`);
+      console.error(`ClinicalTrials.gov API error: ${response.status}`, await response.text());
+      throw new Error(`Failed to fetch from ClinicalTrials.gov API.`);
     }
 
-    const data = await response.json() as ClinicalTrialAPIResponse;
-    
-    if (!data.studies) {
-      return [];
-    }
+    const data = (await response.json()) as ClinicalTrialAPIResponse;
+    const trials = (data.studies || []).map(transformStudyToClinicalTrial);
 
-    // Transform the API response to our interface
-    const trials: ClinicalTrial[] = data.studies.map((study) => {
-      const protocolSection = study.protocolSection || {};
-      const identificationModule = protocolSection.identificationModule || {};
-      const statusModule = protocolSection.statusModule || {};
-      const descriptionModule = protocolSection.descriptionModule || {};
-      const conditionsModule = protocolSection.conditionsModule || {};
-      const armsInterventionsModule = protocolSection.armsInterventionsModule || {};
-      const contactsLocationsModule = protocolSection.contactsLocationsModule || {};
-      const eligibilityModule = protocolSection.eligibilityModule || {};
-      const designModule = protocolSection.designModule || {};
-
-      return {
-        nctId: (identificationModule.nctId as string) || '',
-        briefTitle: (identificationModule.briefTitle as string) || '',
-        officialTitle: identificationModule.officialTitle as string | undefined,
-        briefSummary: descriptionModule.briefSummary as string | undefined,
-        detailedDescription: descriptionModule.detailedDescription as string | undefined,
-        overallStatus: (statusModule.overallStatus as string) || '',
-        phase: (designModule.phases as string[]) || [],
-        studyType: (designModule.studyType as string) || '',
-        conditions: (conditionsModule.conditions as string[]) || [],
-        interventions: ((armsInterventionsModule.interventions as Array<{ type?: string; name?: string }>) || []).map((intervention) => ({
-          type: intervention.type || '',
-          name: intervention.name || ''
-        })),
-        locations: ((contactsLocationsModule.locations as Array<{ facility?: string; city?: string; state?: string; country?: string }>) || []).map((location) => ({
-          facility: location.facility || '',
-          city: location.city || '',
-          state: location.state || '',
-          country: location.country || ''
-        })),
-        eligibilityCriteria: eligibilityModule.eligibilityCriteria as string | undefined,
-        minimumAge: eligibilityModule.minimumAge as string | undefined,
-        maximumAge: eligibilityModule.maximumAge as string | undefined,
-        gender: (eligibilityModule.sex as string) || 'ALL'
-      };
-    });
-
-    // Use AI to rank trials intelligently
+    // Use our AI to intelligently rank the fetched trials.
     return await rankClinicalTrials(trials, patientData);
   } catch (error) {
     console.error('Error searching clinical trials:', error);
-    throw new Error('Failed to search clinical trials');
+    // Return an empty array or re-throw a more specific error for the UI to handle.
+    throw new Error('Failed to search and rank clinical trials.');
   }
 }
